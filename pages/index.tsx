@@ -4,8 +4,11 @@ import Image from 'next/image'
 import Navbar from "../Components/Navbar";
 import Leaderboard from "../Components/Leaderboard";
 import DishwasherGallery from "../Components/DishwasherGallery";
+import {useSession} from "next-auth/client";
 
 const Home: NextPage = () => {
+    const [ session, loading ] = useSession();
+
     return (
         <div className={""}>
             <Head>
@@ -14,14 +17,14 @@ const Home: NextPage = () => {
                 <link rel="icon" href="/favicon.ico"/>
             </Head>
 
-            <Navbar/>
+            <Navbar session={session} loading={loading}/>
 
             <main className={"flex flex-col h-full"}>
                 <Leaderboard className={"pt-5"}/>
                 <DishwasherGallery/>
             </main>
 
-            <footer className={"w-screen fixed bottom-0 border-t-2 py-3"}>
+            <footer className={"w-screen sticky bottom-0 border-t-2 py-3 bg-white"}>
                 <a
                     href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
                     target="_blank"
