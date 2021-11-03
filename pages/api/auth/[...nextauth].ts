@@ -7,15 +7,16 @@ export default NextAuth({
     // https://next-auth.js.org/configuration/providers
     providers: [
         {
-            id: "Thalia",
+            id: "google",
             name: "Thalia",
             type: "oauth",
             version: "2.0",
-            scope: "profile read",
-            authorizationUrl: "https://staging.thalia.nu/user/oauth/authorize",
-            userinfo: "https://staging.thalia.nu/api/v2/members/me",
+            authorization: "https://staging.thalia.nu/user/oauth/authorize/",
+            token: "https://staging.thalia.nu/user/oauth/token/",
+            userinfo:	"https://staging.thalia.nu/user/oauth/info/",
+            jwks_uri: "https://staging.thalia.nu/user/oauth/keys/",
             profile(profile) {
-                return {id: profile?.display_name, display_name: profile?.display_name, photo: profile?.photo}
+                return {id: profile.sub, name: profile.name, email: profile.email, image: profile.picture,}
             },
             clientId: process.env.THALIA_CLIENTID,
         }
@@ -68,7 +69,7 @@ export default NextAuth({
     // pages is not specified for that route.
     // https://next-auth.js.org/configuration/pages
     pages: {
-        signIn: '/auth/signin',  // Displays signin buttons
+        //signIn: '/auth/signin',  // Displays signin buttons
         // signOut: '/auth/signout', // Displays form with sign out button
         // error: '/auth/error', // Error code passed in query string as ?error=
         // verifyRequest: '/auth/verify-request', // Used for check email page

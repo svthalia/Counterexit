@@ -5,7 +5,7 @@ export default function SignIn({ providers }) {
 
     useEffect(() =>{
         if(providers) {
-            signIn(Object.values(providers)[0].id);
+            //signIn(Object.values(providers)[0].id);
         }
         }, [providers])
 
