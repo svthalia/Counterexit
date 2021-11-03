@@ -1,13 +1,14 @@
 import React, {useEffect} from "react";
-import { providers, signIn } from "next-auth/client";
+import {providers, signIn, useSession} from "next-auth/client";
 
 export default function SignIn({ providers }) {
+    const [ session, loading ] = useSession();
 
     useEffect(() =>{
-        if(providers) {
-            //signIn(Object.values(providers)[0].id);
+        if(providers && !session) {
+            signIn(Object.values(providers)[0].id);
         }
-        }, [providers])
+        }, [providers, session])
 
     return (
         <div className={"bg-black w-screen h-screen flex self-center justify-center"}>

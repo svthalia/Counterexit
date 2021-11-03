@@ -1,22 +1,29 @@
 import NextAuth from "next-auth"
 import Providers from "next-auth/providers"
 import * as Process from "process";
+import {ThaliaProfile} from "../../../types/thaliaProfile";
 
 // @ts-ignore
 export default NextAuth({
     // https://next-auth.js.org/configuration/providers
     providers: [
         {
-            id: "google",
+            id: "thalia",
             name: "Thalia",
             type: "oauth",
             version: "2.0",
-            authorization: "https://staging.thalia.nu/user/oauth/authorize/",
-            token: "https://staging.thalia.nu/user/oauth/token/",
-            userinfo:	"https://staging.thalia.nu/user/oauth/info/",
-            jwks_uri: "https://staging.thalia.nu/user/oauth/keys/",
-            profile(profile) {
-                return {id: profile.sub, name: profile.name, email: profile.email, image: profile.picture,}
+            authorizationUrl: "https://staging.thalia.nu/user/oauth/authorize?response_type=code",
+            accessTokenUrl: "https://staging.thalia.nu/user/oauth/token/",
+            profileUrl:	"https://staging.thalia.nu/api/v2/members/me/",
+            scope: "profile:read",
+            params: {grant_type: "authorization_code"},
+            profile: function (profile: ThaliaProfile) {
+                return {
+                    id: profile.pk,
+                    name: profile.profile.display_name,
+                    image: profile.profile.photo.medium,
+                    email: ""
+                }
             },
             clientId: process.env.THALIA_CLIENTID,
         }
@@ -80,8 +87,8 @@ export default NextAuth({
     // when an action is performed.
     // https://next-auth.js.org/configuration/callbacks
     callbacks: {
-        //async signIn(user, account, profile) { return true },
-        // async redirect(url, baseUrl) { return baseUrl },
+        //async signIn(user, account, profile) { console.log(user, account, profile); return true },
+        //async redirect(url, baseUrl) { console.log(url, baseUrl); return baseUrl },
         // async session(session, user) { return session },
         // async jwt(token, user, account, profile, isNewUser) { return token }
     },
