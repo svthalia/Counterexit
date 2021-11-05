@@ -7,7 +7,7 @@ import DishwasherGallery from "../Components/DishwasherGallery";
 import {useSession} from "next-auth/client";
 
 const Home: NextPage = () => {
-    const [ session, loading ] = useSession();
+    const [session, loading] = useSession();
 
     return (
         <div className={""}>
@@ -19,7 +19,7 @@ const Home: NextPage = () => {
 
             <Navbar session={session} loading={loading}/>
 
-            <main className={"flex flex-col h-full"}>
+            <main className={"flex flex-col h-full w-screen"}>
                 <Leaderboard className={"pt-5"}/>
                 <DishwasherGallery/>
             </main>
@@ -34,8 +34,9 @@ const Home: NextPage = () => {
                     <p className={"self-center"}> Check out my github, for the source code!</p>
 
                     <span className={"self-center flex ml-3"}>
-            <Image className={"self-center"} src="/Octocat.png" alt="Github octocat Logo" width={72} height={64}/>
-          </span>
+                        <Image className={"self-center"} src="/Octocat.png" alt="Github octocat Logo" width={72}
+                               height={64}/>
+                    </span>
                 </a>
             </footer>
         </div>

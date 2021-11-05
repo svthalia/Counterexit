@@ -8,6 +8,5 @@ export interface ThaliaProfile {
             medium: string,
             large: string
         },
-
     }
 }

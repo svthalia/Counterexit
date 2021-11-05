@@ -1,19 +1,19 @@
 import React, {useEffect} from "react";
 import {providers, signIn, useSession} from "next-auth/client";
 
-export default function SignIn({ providers }) {
-    const [ session, loading ] = useSession();
+export default function SignIn({providers}) {
+    const [session, loading] = useSession();
 
-    useEffect(() =>{
-        if(providers && !session) {
+    useEffect(() => {
+        if (providers && !session) {
             signIn(Object.values(providers)[0].id);
         }
-        }, [providers, session])
+    }, [providers, session])
 
     return (
         <div className={"bg-black w-screen h-screen flex self-center justify-center"}>
             {Object.values(providers).map((provider) => (
-                <div className={"text-white self-center justify-center"} key={provider.name} >
+                <div className={"text-white self-center justify-center"} key={provider.name}>
                     <button className={"text-white bg-primary self-center justify-center"} onClick={() => {
                         signIn(provider.id);
                     }}>
