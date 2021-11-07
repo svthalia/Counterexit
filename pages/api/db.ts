@@ -20,6 +20,13 @@ const sql = postgres('postgres://username:password@host:port/database', {
     }
 })
 
+/**
+ * Adds user to the database, if the user didn't already exist
+ *
+ * @param session
+ * @return response with status code 200 (ok)
+ */
+
 function addUser(session: Session) {
     sql`
         SELECT * FROM users WHERE name = ${session.user.name}
@@ -34,15 +41,63 @@ function addUser(session: Session) {
     })
 }
 
+/**
+ * Adds washes to the database, if the last entry was more then half an hour ago
+ *
+ * @param session
+ * @return response with status code 425 (to early) or 200 (ok)
+ */
+
 async function addWash(session: Session){
     sql`
-        SELECT time FROM washes ORDER BY time LIMIT 1
+        SELECT time FROM washes WHERE time >= now()::timestamp - INTERVAL '30 min' AND time <= now() LIMIT 1
     `.then((data: any) => {
-        console.log(data)
+        if (data.count === 0){
+            sql`INSERT INTO washes (
+                name, time
+            ) values (
+                ${session.user.name}, now()
+            )`
+        }
+    })
+}
+
+/**
+ * Gets the top 3 dishwashers from the washes database and joins it with the user database
+ * It also makes sure it always returns 3 users
+ *
+ * @return response with status code 425 (to early) or 200 (ok)
+ */
+
+async function getLeaders(){
+    const response = await sql`
+        SELECT *
+        FROM users
+        INNER JOIN
+        (SELECT name, count(*) AS wash FROM washes GROUP BY name) AS washesSort ON washesSort.name = users.name
+        ORDER BY wash
+        LIMIT 3
+    `
+    const winners = response.slice(0,3);
+    for(let i=3; i>winners.length; i--){
+        winners.push({
+            name: 'None',
+            image: 'https://staging.thalia.nu/static/members/images/default-avatar.jpg',
+            wash: 0
+        })
+    }
+    return winners.sort(function (a: { wash: number; }, b: { wash: number; }){
+        return b.wash - a.wash
     })
 }
 
 
+/**
+ * Handles api requests, checks if you are logged in and then executes the correct function dependant on your input
+ ** @param req
+ * @param res
+ * @return response with status code dependant on the function
+ */
 
 export default async function handler(req: NextApiRequest,res: NextApiResponse) {
 
@@ -51,15 +106,20 @@ export default async function handler(req: NextApiRequest,res: NextApiResponse) 
         const body = JSON.parse(req.body)
         switch (body.action) {
             case '?userLogin':
-                addUser(session)
-                res.status(200)
+                addUser(session);
+                res.status(200);
                 break;
             case '?addWash':
-                addWash(session)
-                res.status(200)
+                addWash(session);
+                res.status(200);
+                break;
+            case "?getLeaders":
+                const response = await getLeaders();
+                console.log(response)
+                res.status(200).json(response);
                 break;
             default:
-                res.status(418)
+                res.status(418);
                 break;
         }
     } else {

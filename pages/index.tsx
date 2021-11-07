@@ -6,7 +6,6 @@ import Leaderboard from "../Components/Leaderboard";
 import DishwasherGallery from "../Components/DishwasherGallery";
 import {useSession} from "next-auth/client";
 import {useEffect} from "react";
-import io from "socket.io-client";
 
 
 const Home: NextPage = () => {
@@ -30,7 +29,7 @@ const Home: NextPage = () => {
                 <link rel="icon" href="/favicon.ico"/>
             </Head>
 
-            <Navbar session={session} loading={loading}/>
+            {/*<Navbar session={session} loading={loading}/>*/}
 
             <main className={"flex flex-col h-full w-screen"}>
                 <Leaderboard className={"pt-5"}/>
