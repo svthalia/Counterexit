@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import UserContainer from "./UserContainer";
+
 interface OwnProps {
     className?: string
 }
@@ -10,8 +11,7 @@ let users = [{position: "two", name: "julian", score: 16}, {position: "two", nam
 
 const Leaderboard: FunctionComponent<Props> = (props) => {
 
-
-  return (
+    return (
       <div className={"bg-primary w-screen pb-3"}>
           <h1 className={"text-3xl text-center mt-10 text-white"}>The current standings</h1>
           <div className={"flex md:flex-row flex-col bg-primary w-screen self-center justify-center " + props.className}>
