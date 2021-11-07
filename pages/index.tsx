@@ -6,33 +6,21 @@ import Leaderboard from "../Components/Leaderboard";
 import DishwasherGallery from "../Components/DishwasherGallery";
 import {useSession} from "next-auth/client";
 import {useEffect} from "react";
-import io from 'socket.io-client';
+import io from "socket.io-client";
+
 
 const Home: NextPage = () => {
     const [session, loading] = useSession();
 
     useEffect(() => {
-        fetch('/api/socketio').finally(() => {
-            const socket = io()
-
-            socket.on('connect', () => {
-                console.log('connect')
-                socket.emit('hello')
+        if(session){
+            const response = fetch('/api/db', {
+                method: "PUT",
+                body: JSON.stringify({action: "?userLogin"})
             })
+        }
 
-            socket.on('hello', (data: any) => {
-                console.log('hello', data)
-            })
-
-            socket.on('a user connected', () => {
-                console.log('a user connected')
-            })
-
-            socket.on('disconnect', () => {
-                console.log('disconnect')
-            })
-        })
-    }, []) // Added [] as useEffect filter so it will be executed only once, when component is mounted
+    }, [session]) // Added [] as useEffect filter so it will be executed only once, when component is mounted
 
     return (
         <div className={""}>

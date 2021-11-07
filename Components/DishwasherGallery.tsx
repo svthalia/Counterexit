@@ -30,7 +30,12 @@ const DishwasherGallery: FunctionComponent<Props> = (props) => {
               </div>
               <div className={imageClass}>
                   <div className={" aspect-w-7 aspect-h-7"}>
-                      <button className={"bg-primary text-white"}>
+                      <button className={"bg-primary text-white"} onClick={() => {
+                          const response = fetch('/api/db', {
+                              method: "PUT",
+                              body: JSON.stringify({action: "?addWash"})
+                          })
+                      }}>
                           <p>Clean out the dishwasher</p>
                       </button>
                   </div>

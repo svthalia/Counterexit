@@ -3,7 +3,7 @@ import Providers from "next-auth/providers"
 import * as Process from "process";
 import {ThaliaProfile} from "../../../types/thaliaProfile";
 
-// @ts-ignore
+
 export default NextAuth({
     // https://next-auth.js.org/configuration/providers
     providers: [
@@ -17,14 +17,14 @@ export default NextAuth({
             profileUrl:	"https://staging.thalia.nu/api/v2/members/me/",
             scope: "profile:read",
             params: {grant_type: "authorization_code"},
+            // @ts-ignore
             profile: function (profile: ThaliaProfile) {
                 return {
-                    id: profile.pk,
                     name: profile.profile.display_name,
                     image: profile.profile.photo.medium,
-                    email: ""
                 }
             },
+            // @ts-ignore
             clientId: process.env.THALIA_CLIENTID,
         }
     ],
