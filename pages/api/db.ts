@@ -48,18 +48,20 @@ function addUser(session: Session) {
  * @return response with status code 425 (to early) or 200 (ok)
  */
 
-async function addWash(session: Session){
-    sql`
+async function addWash(session: Session): Promise<boolean>{
+    const data = await sql`
         SELECT time FROM washes WHERE time >= now()::timestamp - INTERVAL '30 min' AND time <= now() LIMIT 1
-    `.then((data: any) => {
-        if (data.count === 0){
-            sql`INSERT INTO washes (
-                name, time
-            ) values (
-                ${session.user.name}, now()
-            )`
-        }
-    })
+    `
+    if (data.count === 0){
+        await sql`INSERT INTO washes (
+            name, time
+        ) values (
+            ${session.user.name}, now()
+        )`
+        return true;
+    }else{
+        return false;
+    }
 }
 
 /**
@@ -102,28 +104,32 @@ async function getLeaders(){
 export default async function handler(req: NextApiRequest,res: NextApiResponse) {
 
     const session = await getSession({req})
-    if (session) {
         const body = JSON.parse(req.body)
         switch (body.action) {
             case '?userLogin':
-                addUser(session);
+                if (session) {
+                    addUser(session);
+                }
                 res.status(200);
                 break;
             case '?addWash':
-                addWash(session);
-                res.status(200);
+                if (session) {
+                    const done = await addWash(session);
+                    if (done){
+                        res.status(200);
+                    }else{
+                        res.status(425);
+                    }
+                }
+
                 break;
             case "?getLeaders":
                 const response = await getLeaders();
-                console.log(response)
                 res.status(200).json(response);
                 break;
             default:
                 res.status(418);
                 break;
         }
-    } else {
-        res.status(401)
-    }
     res.end()
 }

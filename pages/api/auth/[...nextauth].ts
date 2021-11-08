@@ -1,7 +1,6 @@
 import NextAuth from "next-auth"
-import Providers from "next-auth/providers"
-import * as Process from "process";
 import {ThaliaProfile} from "../../../types/thaliaProfile";
+
 
 
 export default NextAuth({
@@ -20,8 +19,10 @@ export default NextAuth({
             // @ts-ignore
             profile: function (profile: ThaliaProfile) {
                 return {
+                    id: profile.pk,
                     name: profile.profile.display_name,
                     image: profile.profile.photo.medium,
+                    email: ""
                 }
             },
             // @ts-ignore

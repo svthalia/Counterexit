@@ -5,11 +5,12 @@ import Navbar from "../Components/Navbar";
 import Leaderboard from "../Components/Leaderboard";
 import DishwasherGallery from "../Components/DishwasherGallery";
 import {useSession} from "next-auth/client";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 
 
 const Home: NextPage = () => {
     const [session, loading] = useSession();
+    const [reload, setReload] = useState(false);
 
     useEffect(() => {
         if(session){
@@ -29,16 +30,16 @@ const Home: NextPage = () => {
                 <link rel="icon" href="/favicon.ico"/>
             </Head>
 
-            {/*<Navbar session={session} loading={loading}/>*/}
+            <Navbar session={session} loading={loading}/>
 
-            <main className={"flex flex-col h-full w-screen"}>
-                <Leaderboard className={"pt-5"}/>
-                <DishwasherGallery/>
+            <main className={"flex flex-col h-full "}>
+                <Leaderboard className={"pt-5"} reload={reload} reloadDone={() => setReload(false)}/>
+                <DishwasherGallery session={session} loading={loading} reloadLeaderboard={() => {setReload(true)}}/>
             </main>
 
-            <footer className={"w-screen sticky bottom-0 border-t-2 py-3 bg-white"}>
+            <footer className={" sticky bottom-0 border-t-2 py-3 bg-white"}>
                 <a
-                    href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
+                    href="https://github.com/Gulianrdgd/Counterexit"
                     target="_blank"
                     rel="noopener noreferrer"
                     className={"flex flex-row justify-center self-center"}

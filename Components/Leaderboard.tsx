@@ -4,7 +4,10 @@ import Spinner from 'react-spinner-material';
 
 interface OwnProps {
     className?: string
+    reload: boolean
+    reloadDone: () => void
 }
+
 interface Users {
     name: string,
     wash: number,
@@ -24,16 +27,17 @@ const Leaderboard: FunctionComponent<Props> = (props) => {
                     setUsers(data)
                 })
             })
-    }, []) // Added [] as useEffect filter so it will be executed only once, when component is mounted
+            props.reloadDone();
+    }, [props.reload]) // Added [] as useEffect filter so it will be executed only once, when component is mounted
 
 
     return (
-      <div className={"bg-primary w-screen pb-3"}>
+      <div className={"bg-primary pb-3"}>
           <h1 className={"text-3xl text-center mt-10 text-white"}>The current standings</h1>
           {
               users.length === 3 &&
 
-              <div className={"flex md:flex-row flex-col bg-primary w-screen self-center justify-center " + props.className}>
+              <div className={"flex md:flex-row flex-col bg-primary self-center justify-center " + props.className}>
                   {/* Bit of a ugly hack but keeps the right order on mobile */}
                   <div className={"md:block hidden"}> {/* No 2 */}
                       <UserContainer name={users[1].name} score={users[1].wash} number_one={false} image={users[1].image}/>
@@ -60,7 +64,7 @@ const Leaderboard: FunctionComponent<Props> = (props) => {
           }
           {
               users.length !== 3 &&
-              <div className={"flex flex-col bg-primary w-screen self-center justify-center " + props.className}>
+              <div className={"flex flex-col bg-primary self-center justify-center " + props.className}>
                   <div className={"justify-center self-center my-5"}>
                     <Spinner radius={120} color={"#fff"} stroke={2} visible={true} />
                   </div>
