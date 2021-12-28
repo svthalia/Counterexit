@@ -6,6 +6,7 @@ import Leaderboard from "../Components/Leaderboard";
 import DishwasherGallery from "../Components/DishwasherGallery";
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
+import UserTable from "../Components/UserTable";
 
 
 const Home: NextPage = () => {
@@ -36,6 +37,7 @@ const Home: NextPage = () => {
             <main className={"flex flex-col h-full "}>
                 <Leaderboard className={"pt-5"} reload={reload} reloadDone={() => setReload(false)}/>
                 <DishwasherGallery session={session} loading={loading} reloadLeaderboard={() => {setReload(true)}}/>
+                <UserTable session={session}/>
             </main>
 
             <footer className={" sticky bottom-0 border-t-2 py-3 bg-white"}>

@@ -54,11 +54,10 @@ function addUser(session: Session) {
 /**
  * Gets the current state on the dishwasher
  *
- * @param session
  * @return returns the time 0 when the washing machine is ready or returns next time when dishwasher is ready
  */
 
-async function getCurrentState(session: Session): Promise<number> {
+async function getCurrentState(): Promise<number> {
     const latest = await sql`SELECT time FROM washes WHERE time >= now()::timestamp - INTERVAL '30 min' AND time <= now() LIMIT 1`;
     if (latest.count === 0) {
         return 0;
@@ -122,7 +121,31 @@ async function getLeaders() {
         return b.wash - a.wash
     })
 }
+interface user {
+    name: string,
+    image: string,
+    pk: number,
+    wash: number
+}
+async function getLeaderboard() {
 
+
+    const response = await sql`
+        SELECT *
+        FROM users
+        INNER JOIN
+        (SELECT pk, count(*) AS wash FROM washes GROUP BY pk) AS washesSort ON washesSort.pk = users.pk
+        ORDER BY wash
+    `
+
+    const users = response.map((e: user) => {
+        return {name: e.name, wash: e.wash}
+    })
+
+    return users.sort(function (a: { wash: number; }, b: { wash: number; }) {
+        return b.wash - a.wash
+    })
+}
 
 /**
  * Handles api requests, checks if you are logged in and then executes the correct function dependant on your input
@@ -160,9 +183,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const response = await getLeaders();
             res.status(200).json(response);
             break;
+        case '?getLeaderboard':
+            if (session) {
+                const users = await getLeaderboard();
+                if (users) {
+                    res.status(200).json(users);
+                } else {
+                    res.status(401).json([]);
+                }
+            } else {
+                res.status(401).json([]);
+            }
+            break;
         case "?getStatus":
             if (session) {
-                const time = await getCurrentState(session);
+                const time = await getCurrentState();
                 res.status(200).json(time);
             } else {
                 res.status(401);
