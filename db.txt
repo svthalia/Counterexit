@@ -1,0 +1,44 @@
+############################
+#####   Table Users    #####
+############################
+
+-- auto-generated definition
+create table users
+(
+    name  varchar not null,
+    image varchar not null,
+    pk    integer not null
+        constraint users_pk
+            primary key
+);
+
+alter table users
+    owner to julianvdh;
+
+create unique index users_pk_uindex
+    on users (pk);
+
+grant insert, select, update on users to dishwasher;
+
+############################
+#####   Table Washes   #####
+############################
+
+-- auto-generated definition
+create table washes
+(
+    pk   integer   not null
+        constraint washes_users_pk_fk
+            references users,
+    time timestamp not null
+);
+
+alter table washes
+    owner to julianvdh;
+
+create unique index washes_time_uindex
+    on washes (time);
+
+grant insert, references, select, trigger, truncate, update on washes to dishwasher;
+
+

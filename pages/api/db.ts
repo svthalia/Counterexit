@@ -1,5 +1,5 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
-import {getSession} from "next-auth/client";
+import {getSession} from "next-auth/react";
 import {Session} from "next-auth";
 
 const postgres = require('postgres');
@@ -29,16 +29,44 @@ const sql = postgres('postgres://username:password@host:port/database', {
 
 function addUser(session: Session) {
     sql`
-        SELECT * FROM users WHERE name = ${session.user.name}
+        SELECT * FROM users WHERE pk = ${session.user.id}
     `.then((data: any) => {
-        if(data.count === 0 ){
+        if (data.count === 0) {
             sql`INSERT INTO users (
-                name, image
+                name, image, pk
             ) values (
-                ${session.user.name}, ${session.user.image}
+                ${session.user.name}, ${session.user.image}, ${session.user.id}
             )`
+        } else if (data[0].name !== session.user.name || data[0].image !== session.user.image){
+            sql`
+              UPDATE 
+                users 
+              SET 
+                name = ${session.user.name},
+                image = ${session.user.image} 
+              WHERE 
+                pk = ${ session.user.id }
+            `
         }
     })
+}
+
+/**
+ * Gets the current state on the dishwasher
+ *
+ * @param session
+ * @return returns the time 0 when the washing machine is ready or returns next time when dishwasher is ready
+ */
+
+async function getCurrentState(session: Session): Promise<number> {
+    const latest = await sql`SELECT time FROM washes WHERE time >= now()::timestamp - INTERVAL '30 min' AND time <= now() LIMIT 1`;
+    if (latest.count === 0) {
+        return 0;
+    } else {
+        const last_time = Date.parse(latest[0].time);
+        const washReady = new Date(last_time + 30 * 60000)
+        return washReady.valueOf();
+    }
 }
 
 /**
@@ -48,18 +76,18 @@ function addUser(session: Session) {
  * @return response with status code 425 (to early) or 200 (ok)
  */
 
-async function addWash(session: Session): Promise<boolean>{
+async function addWash(session: Session): Promise<boolean> {
     const data = await sql`
         SELECT time FROM washes WHERE time >= now()::timestamp - INTERVAL '30 min' AND time <= now() LIMIT 1
     `
-    if (data.count === 0){
+    if (data.count === 0) {
         await sql`INSERT INTO washes (
-            name, time
+            pk, time
         ) values (
-            ${session.user.name}, now()
+            ${session.user.id}, now()
         )`
         return true;
-    }else{
+    } else {
         return false;
     }
 }
@@ -71,24 +99,26 @@ async function addWash(session: Session): Promise<boolean>{
  * @return response with status code 425 (to early) or 200 (ok)
  */
 
-async function getLeaders(){
+async function getLeaders() {
     const response = await sql`
         SELECT *
         FROM users
         INNER JOIN
-        (SELECT name, count(*) AS wash FROM washes GROUP BY name) AS washesSort ON washesSort.name = users.name
+        (SELECT pk, count(*) AS wash FROM washes GROUP BY pk) AS washesSort ON washesSort.pk = users.pk
         ORDER BY wash
         LIMIT 3
     `
-    const winners = response.slice(0,3);
-    for(let i=3; i>winners.length; i--){
+    const winners = response.slice(0, 3);
+    const win_length = winners.length;
+
+    for (let i = 3; i > win_length; i--) {
         winners.push({
             name: 'None',
             image: 'https://staging.thalia.nu/static/members/images/default-avatar.jpg',
             wash: 0
         })
     }
-    return winners.sort(function (a: { wash: number; }, b: { wash: number; }){
+    return winners.sort(function (a: { wash: number; }, b: { wash: number; }) {
         return b.wash - a.wash
     })
 }
@@ -101,35 +131,46 @@ async function getLeaders(){
  * @return response with status code dependant on the function
  */
 
-export default async function handler(req: NextApiRequest,res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const session = await getSession({req})
-        const body = JSON.parse(req.body)
-        switch (body.action) {
-            case '?userLogin':
-                if (session) {
-                    addUser(session);
-                }
+    const body = JSON.parse(req.body)
+    switch (body.action) {
+        case '?userLogin':
+            if (session) {
+                addUser(session);
                 res.status(200);
-                break;
-            case '?addWash':
-                if (session) {
-                    const done = await addWash(session);
-                    if (done){
-                        res.status(200);
-                    }else{
-                        res.status(425);
-                    }
+            } else {
+                res.status(401);
+            }
+            break;
+        case '?addWash':
+            if (session) {
+                const done = await addWash(session);
+                if (done) {
+                    res.status(200);
+                } else {
+                    res.status(425);
                 }
-
-                break;
-            case "?getLeaders":
-                const response = await getLeaders();
-                res.status(200).json(response);
-                break;
-            default:
-                res.status(418);
-                break;
-        }
+            } else {
+                res.status(401);
+            }
+            break;
+        case "?getLeaders":
+            const response = await getLeaders();
+            res.status(200).json(response);
+            break;
+        case "?getStatus":
+            if (session) {
+                const time = await getCurrentState(session);
+                res.status(200).json(time);
+            } else {
+                res.status(401);
+            }
+            break;
+        default:
+            res.status(418);
+            break;
+    }
     res.end()
 }

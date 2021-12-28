@@ -2,7 +2,6 @@ import NextAuth from "next-auth"
 import {ThaliaProfile} from "../../../types/thaliaProfile";
 
 
-
 export default NextAuth({
     // https://next-auth.js.org/configuration/providers
     providers: [
@@ -11,22 +10,36 @@ export default NextAuth({
             name: "Thalia",
             type: "oauth",
             version: "2.0",
-            authorizationUrl: "https://staging.thalia.nu/user/oauth/authorize?response_type=code",
-            accessTokenUrl: "https://staging.thalia.nu/user/oauth/token/",
-            profileUrl:	"https://staging.thalia.nu/api/v2/members/me/",
-            scope: "profile:read",
-            params: {grant_type: "authorization_code"},
+            //authorizationUrl: "https://staging.thalia.nu/user/oauth/authorize?response_type=code",
+            //accessTokenUrl: "https://staging.thalia.nu/user/oauth/token/",
+            //profileUrl: "https://staging.thalia.nu/api/v2/members/me/",
+            //scope: "profile:read",
+            authorization: {
+                url: "https://staging.thalia.nu/user/oauth/authorize?response_type=code",
+                params: {grant_type: "authorization_code", scope: "profile:read"},
+            },
+            token: {
+                url: "https://staging.thalia.nu/user/oauth/token/",
+                params: {grant_type: "authorization_code", scope: "profile:read"},
+
+            },
+            userinfo: {
+               url: "https://staging.thalia.nu/api/v2/members/me/",
+                params: {grant_type: "authorization_code", scope: "profile:read"},
+
+            },
             // @ts-ignore
             profile: function (profile: ThaliaProfile) {
                 return {
-                    id: profile.pk,
                     name: profile.profile.display_name,
                     image: profile.profile.photo.medium,
-                    email: ""
+                    id: profile.pk // Kinda sad but fuck next-auth
                 }
             },
             // @ts-ignore
             clientId: process.env.THALIA_CLIENTID,
+            clientSecret: process.env.THALIA_CLIENTSECRET,
+
         }
     ],
     // Database optional. MySQL, Maria DB, Postgres and MongoDB are supported.
@@ -46,7 +59,7 @@ export default NextAuth({
         // Use JSON Web Tokens for session instead of database sessions.
         // This option can be used with or without a database for users/accounts.
         // Note: `jwt` is automatically set to `true` if no database is specified.
-        jwt: true,
+        strategy: "jwt",
 
         // Seconds - How long until an idle session expires and is no longer valid.
         // maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -90,7 +103,12 @@ export default NextAuth({
     callbacks: {
         //async signIn(user, account, profile) { console.log(user, account, profile); return true },
         //async redirect(url, baseUrl) { console.log(url, baseUrl); return baseUrl },
-        // async session(session, user) { return session },
+
+        async session({ session, token, user }){
+            session.user.id = parseInt(<string>token.sub)
+            return session
+        },
+
         // async jwt(token, user, account, profile, isNewUser) { return token }
     },
 
