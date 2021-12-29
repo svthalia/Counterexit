@@ -1,0 +1,7 @@
+[Unit]
+Wants=dishwasherTimer.timer
+Description=Get the winner and clear washes
+
+[Service]
+Type=oneshot
+ExecStart=/DISHWASHERLOCATION/dishwasher-otm/venv/bin/python /DISHWASHERLOCATION/dishwasher-otm/scripts/getWinner.py

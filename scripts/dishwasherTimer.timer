@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer for dishwasher winner service, runs once every month at 12
+
+[Timer]
+OnCalendar= *-*-01 12:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

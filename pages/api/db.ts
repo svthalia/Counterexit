@@ -104,7 +104,7 @@ async function getLeaders() {
         FROM users
         INNER JOIN
         (SELECT pk, count(*) AS wash FROM washes GROUP BY pk) AS washesSort ON washesSort.pk = users.pk
-        ORDER BY wash
+        ORDER BY wash DESC
         LIMIT 3
     `
     const winners = response.slice(0, 3);
@@ -135,7 +135,7 @@ async function getLeaderboard() {
         FROM users
         INNER JOIN
         (SELECT pk, count(*) AS wash FROM washes GROUP BY pk) AS washesSort ON washesSort.pk = users.pk
-        ORDER BY wash
+        ORDER BY wash DESC
     `
 
     const users = response.map((e: user) => {

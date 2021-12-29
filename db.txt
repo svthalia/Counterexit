@@ -13,7 +13,7 @@ create table users
 );
 
 alter table users
-    owner to julianvdh;
+    owner to dishwasher;
 
 create unique index users_pk_uindex
     on users (pk);
@@ -34,11 +34,28 @@ create table washes
 );
 
 alter table washes
-    owner to julianvdh;
+    owner to dishwasher;
 
 create unique index washes_time_uindex
     on washes (time);
 
-grant insert, references, select, trigger, truncate, update on washes to dishwasher;
+############################
+#####  Table Winners   #####
+############################
 
+-- auto-generated definition
+create table winners
+(
+    pk     integer not null
+        constraint winners_users_pk_fk
+            references users,
+    time   varchar not null,
+    washes integer not null
+);
+
+alter table winners
+    owner to dishwasher;
+
+create unique index winners_time_uindex
+    on winners (time);
 
