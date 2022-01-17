@@ -1,22 +1,12 @@
-This is the Source code for the Mercator I dishwasher leaderboard, here users can compete for the "Dishwasher of the Month" title.
-## Getting Started
+# Counterexit
 
-First, run the development server:
+This is the Source code for the Mercator I dishwasher leaderboard, here users can compete for the "Dishwasher of the Month" title. Every 30 minutes you can start a wash and every month the best washer gets picked.
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+you can see it running on https://dishwasher.vdhorst.dev
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## My stack
+- NextJS
+- NextAuth (For authentication with the Thalia oauth service)
+- Tailwindcss
+- Postgresql
 
