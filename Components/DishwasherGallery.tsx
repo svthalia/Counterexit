@@ -30,17 +30,18 @@ const DishwasherGallery: FunctionComponent<Props> = (props) => {
             }).then((response) => {
                 if (response.status === 200) {
                     response.json().then((time) => {
-                        console.log(time)
-                        const date = new Date(time)
-                        setState({
-                            ...state,
-                            new_time: date.toLocaleTimeString('nl-NL', {
-                                hour: "numeric",
-                                minute: "numeric",
-                                hour12: false
-                            }),
-                            busy: time !== 0
-                        });
+                        if(time) {
+                            const date = new Date(time)
+                            setState({
+                                ...state,
+                                new_time: date.toLocaleTimeString('nl-NL', {
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                    hour12: false
+                                }),
+                                busy: time !== 0
+                            });
+                        }
                     })
                 }
             })

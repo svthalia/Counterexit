@@ -60,7 +60,6 @@ const MoreInformation: FunctionComponent<Props> = (props) => {
             }).then((response) => {
                 if (response.status === 200) {
                     response.json().then((user) => {
-                        console.log("winner", user)
                         if(user !== null) {
                             setLastWinner(user)
                         }

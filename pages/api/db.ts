@@ -236,8 +236,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             break;
         case "?getLastWinner":
             const winner = await getLastWinner();
-            console.log(winner);
-            res.status(200).json(winner);
+            if(winner) {
+                res.status(200).json(winner);
+            }else{
+                res.status(200);
+            }
             break;
         case "?getStatus":
             if (session) {
