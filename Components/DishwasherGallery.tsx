@@ -10,6 +10,7 @@ interface OwnProps {
 
 type Props = OwnProps;
 
+
 const DishwasherGallery: FunctionComponent<Props> = (props) => {
 
     const imageDivClass = "mx-12 filter drop-shadow-lg"

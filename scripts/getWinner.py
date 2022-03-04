@@ -1,21 +1,17 @@
 from pathlib import Path
-from dotenv import load_dotenv
-from datetime import datetime
+import datetime
 import psycopg2
 import os
 
-dotenv_path = Path('.env.local')
-
-load_dotenv(dotenv_path=dotenv_path)
 
 connection = False
 
 try:
-    connection = psycopg2.connect(user=os.getenv('DBUSERNAME'),
-                                  password=os.getenv('DBPASSWORD'),
-                                  host="127.0.0.1",
+    connection = psycopg2.connect(user=os.environ['DBUSERNAME'],
+                                  password=os.environ['DBPASSWORD'],
+                                  host="database",
                                   port="5432",
-                                  database=os.getenv('DB'))
+                                  database=os.environ['DB'])
 
     print("PostgreSQL connection is open")
     cursor = connection.cursor()
@@ -24,11 +20,18 @@ try:
         "washesSort.pk = users.pk ORDER BY wash DESC LIMIT 1")
     record = cursor.fetchone()
 
-    now = datetime.now()
-    win_time = now.strftime('%m/%Y')
+    today = datetime.date.today()
+    first = today.replace(day=1)
+    lastMonth = first - datetime.timedelta(days=1)
+
+    win_time = lastMonth.strftime('%m/%Y')
     print(f"Congrats: {record[0]}! You won on: {win_time} with {record[4]} washes")
 
     cursor.execute(f"INSERT INTO winners (pk, time, washes) VALUES ({record[2]}, '{win_time}', {record[4]})")
+    connection.commit()
+
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM washes")
     connection.commit()
 
 except (Exception, psycopg2.Error) as error:

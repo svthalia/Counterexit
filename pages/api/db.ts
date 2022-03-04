@@ -4,8 +4,8 @@ import {Session} from "next-auth";
 
 const postgres = require('postgres');
 
-const sql = postgres('postgres://username:password@host:port/database', {
-    host: 'localhost',         // Postgres ip address or domain name
+const sql = postgres('postgres://username:password@host:port', {
+    host: 'database',         // Postgres ip address or domain name
     port: 5432,       // Postgres server port
     path: '',         // unix socket path (usually '/tmp')
     database: process.env.DB,         // Name of database to connect to
@@ -110,9 +110,10 @@ async function getLastWinner() {
     const response = await sql`
         SELECT *
         FROM winners
-        WHERE time = ${month + "/" + year}
+        WHERE time = ${(month < 9 ? "0" + month : month) + "/" + year}
         LIMIT 1
     `
+
     if(response.count !== 0){
         const user = await sql`
         SELECT *

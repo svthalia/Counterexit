@@ -1,8 +1,5 @@
-############################
-#####   Table Users    #####
-############################
 
--- auto-generated definition
+
 create table users
 (
     name  varchar not null,
@@ -20,11 +17,6 @@ create unique index users_pk_uindex
 
 grant insert, select, update on users to dishwasher;
 
-############################
-#####   Table Washes   #####
-############################
-
--- auto-generated definition
 create table washes
 (
     pk   integer   not null
@@ -39,11 +31,6 @@ alter table washes
 create unique index washes_time_uindex
     on washes (time);
 
-############################
-#####  Table Winners   #####
-############################
-
--- auto-generated definition
 create table winners
 (
     pk     integer not null

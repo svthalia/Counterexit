@@ -1,0 +1,42 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres:11.5
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: FSbz!w!gY!22R!!C
+      POSTGRES_USER: dishwasher
+      POSTGRES_DB: dishwasher_prod
+      PGPASSWORD: FSbz!w!gY!22R!!C
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+    volumes:
+      - "./postgres-data:/var/lib/postgresql/data"
+      - "./init-db/:/docker-entrypoint-initdb.d/"
+
+  nextjs:
+    build: .
+    restart: always
+    links:
+      - "db:database"
+    ports:
+      - "3000:3000"
+    environment:
+      THALIA_CLIENTID: "P5Ro3wJmDyYcPfzAxvVRex3j8a7herwUb3LcoEQR"
+      THALIA_CLIENTSECRET: "pmStkhqVQfK0OpPrmGMH1l4N20VcagoJly94QhwL75grovEUtlIPIjFeHusrxBxQWl10owtqB4OUMLxJ2qQU6W72nh1HuNvrdBjx7Ld9ayfkX4Ixsf02UNFItM5PcZ2k"
+      SECRET: "TjFpLfoKz23UsMOtNmERoHxW2uKa57WJyYDRFzEwBSWHQIcccPS1ZJfSXMQqp4iE"
+      NEXTAUTH_URL: "http://localhost:3000"
+      DB: dishwasher_prod
+      DBUSERNAME: dishwasher
+      DBPASSWORD: FSbz!w!gY!22R!!C
+
+  cronjob:
+    build: ./scripts
+    restart: always
+    links:
+      - "db:database"
+    environment:
+      DB: dishwasher_prod
+      DBUSERNAME: dishwasher
+      DBPASSWORD: FSbz!w!gY!22R!!C
