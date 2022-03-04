@@ -11,7 +11,7 @@ type Props = OwnProps;
 
 const Navbar: FunctionComponent<Props> = (props) => {
 
-    return (<nav className={"flex md:flex-row flex-col md:justify-between justify-center bg-primary py-3 filter drop-shadow-lg"}>
+    return (<nav className={"flex md:flex-row flex-col md:justify-between justify-center bg-primary py-3 filter drop-shadow-lg font-bold"}>
         <h1 className={"md:ml-12 m-0 text-white text-2xl md:text-lg self-center"}>Dishwasher of the month</h1>
         {!props.session &&
             <button className={"md:mr-12 m-0 my-2 md:my-0 text-black text-lg bg-white rounded-lg px-4 py-1 self-center filter drop-shadow-lg"} onClick={() => signIn()}>

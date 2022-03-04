@@ -7,6 +7,7 @@ import DishwasherGallery from "../Components/DishwasherGallery";
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
 import MoreInformation from "../Components/MoreInformation";
+import InformationMessage from "../Components/InformationMessage";
 
 
 const Home: NextPage = () => {
@@ -35,6 +36,7 @@ const Home: NextPage = () => {
             <Navbar session={session} loading={loading}/>
 
             <main className={"flex flex-col h-full "}>
+                <InformationMessage/>
                 <DishwasherGallery session={session} loading={loading} reloadLeaderboard={() => {setReload(true)}}/>
                 <Leaderboard className={"pt-5"} reload={reload} reloadDone={() => setReload(false)}/>
                 <MoreInformation session={session} reload={reload}/>
