@@ -10,21 +10,17 @@ export default NextAuth({
             name: "Thalia",
             type: "oauth",
             version: "2.0",
-            //authorizationUrl: "https://staging.thalia.nu/user/oauth/authorize?response_type=code",
-            //accessTokenUrl: "https://staging.thalia.nu/user/oauth/token/",
-            //profileUrl: "https://staging.thalia.nu/api/v2/members/me/",
-            //scope: "profile:read",
             authorization: {
-                url: "https://staging.thalia.nu/user/oauth/authorize?response_type=code",
+                url: "https://thalia.nu/user/oauth/authorize?response_type=code",
                 params: {grant_type: "authorization_code", scope: "profile:read"},
             },
             token: {
-                url: "https://staging.thalia.nu/user/oauth/token/",
+                url: "https://thalia.nu/user/oauth/token/",
                 params: {grant_type: "authorization_code", scope: "profile:read"},
 
             },
             userinfo: {
-               url: "https://staging.thalia.nu/api/v2/members/me/",
+               url: "https://thalia.nu/api/v2/members/me/",
                 params: {grant_type: "authorization_code", scope: "profile:read"},
 
             },

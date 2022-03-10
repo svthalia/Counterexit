@@ -151,7 +151,7 @@ async function getLeaders() {
     for (let i = 3; i > win_length; i--) {
         winners.push({
             name: 'None',
-            image: 'https://staging.thalia.nu/static/members/images/default-avatar.jpg',
+            image: 'https://thalia.nu/static/members/images/default-avatar.jpg',
             wash: 0
         })
     }

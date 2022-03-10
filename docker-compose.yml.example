@@ -1,0 +1,78 @@
+version: '3.1'
+
+services:
+  nginx:
+    container_name: 'nginx'
+    image: 'jwilder/nginx-proxy'
+    restart: 'always'
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - '/var/run/docker.sock:/tmp/docker.sock:ro'
+      - './nginx/html/:/usr/share/nginx/html/'
+      - './nginx/conf.d/:/etc/nginx/conf.d/'
+      - './nginx/certs/:/etc/nginx/certs/:ro'
+      - './nginx/vhost.d/:/etc/nginx/vhost.d/'
+      - './nginx/dhparam/:/etc/nginx/dhparam/'
+    environment:
+      ENABLE_IPV6: 'true'
+      DEFAULT_HOST: 'dishwasher.thalia.nu'
+
+  letsencrypt:
+    image: 'jrcs/letsencrypt-nginx-proxy-companion'
+    restart: 'always'
+    depends_on:
+      - 'nginx'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+      - './nginx/html/:/usr/share/nginx/html/'
+      - './nginx/conf.d/:/etc/nginx/conf.d/'
+      - './nginx/vhost.d/:/etc/nginx/vhost.d/'
+      - './nginx/dhparam/:/etc/nginx/dhparam/'
+      - './nginx/certs/:/etc/nginx/certs/'
+    environment:
+      NGINX_PROXY_CONTAINER: 'nginx'
+      DEFAULT_EMAIL: 'www@thalia.nu'
+
+  db:
+    image: postgres:11.5
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ***********************
+      POSTGRES_USER: dishwasher
+      POSTGRES_DB: dishwasher_prod
+      PGPASSWORD: ***********************
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+    volumes:
+      - "./postgres-data:/var/lib/postgresql/data"
+      - "./init-db/:/docker-entrypoint-initdb.d/"
+
+  nextjs:
+    build: .
+    restart: always
+    links:
+      - "db:database"
+    environment:
+      THALIA_CLIENTID: "*******************************************************"
+      THALIA_CLIENTSECRET: "********************************************************************************************"
+      SECRET: "******************************************************************************************************************************************"
+      NEXTAUTH_URL: "https://dishwasher.thalia.nu"
+      DB: dishwasher_prod
+      DBUSERNAME: dishwasher
+      DBPASSWORD: ***********************
+      VIRTUAL_HOST: 'dishwasher.thalia.nu'
+      VIRTUAL_PORT: 3000
+      LETSENCRYPT_HOST: 'dishwasher.thalia.nu'     
+      LETSENCRYPT_EMAIL: 'www@thalia.nu'
+
+  cronjob:
+    build: ./scripts
+    restart: always
+    links:
+      - "db:database"
+    environment:
+      DB: dishwasher_prod
+      DBUSERNAME: dishwasher
+      DBPASSWORD: ***********************
+
